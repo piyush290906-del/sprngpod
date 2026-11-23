@@ -29,18 +29,39 @@ if (!fs.existsSync(CSV_PATH)) {
   fs.writeFileSync(CSV_PATH, header, 'utf8');
 }
 
-function calculateSessionDates(dayName, timeStr) {
-  const targetDay = (dayName || '').toLowerCase().includes('tue') ? 2 : 4; // 2=Tue, 4=Thu
-  const hour = (timeStr || '').includes('4:00') ? 16 : 14;
+function calculateSessionDates(dayName, timeStr, explicitStarts, explicitEnds) {
+  if (explicitStarts && explicitEnds) {
+    return { startsAt: explicitStarts, endsAt: explicitEnds };
+  }
+  const is4pm = (timeStr || '').includes('4:00');
+  const d = String(dayName || '').toLowerCase();
+  if (d.includes('24 nov')) {
+    return is4pm
+      ? { startsAt: '2026-11-24T12:00:00Z', endsAt: '2026-11-24T13:00:00Z' }
+      : { startsAt: '2026-11-24T10:00:00Z', endsAt: '2026-11-24T11:00:00Z' };
+  }
+  if (d.includes('26 nov')) {
+    return is4pm
+      ? { startsAt: '2026-11-26T12:00:00Z', endsAt: '2026-11-26T13:00:00Z' }
+      : { startsAt: '2026-11-26T10:00:00Z', endsAt: '2026-11-26T11:00:00Z' };
+  }
+  if (d.includes('1 dec')) {
+    return is4pm
+      ? { startsAt: '2026-12-01T12:00:00Z', endsAt: '2026-12-01T13:00:00Z' }
+      : { startsAt: '2026-12-01T10:00:00Z', endsAt: '2026-12-01T11:00:00Z' };
+  }
+  if (d.includes('3 dec')) {
+    return is4pm
+      ? { startsAt: '2026-12-03T12:00:00Z', endsAt: '2026-12-03T13:00:00Z' }
+      : { startsAt: '2026-12-03T10:00:00Z', endsAt: '2026-12-03T11:00:00Z' };
+  }
+  const targetDay = d.includes('tue') ? 2 : 4;
+  const hour = is4pm ? 16 : 14;
   const now = new Date();
   const currentDay = now.getUTCDay();
-  const utcHour = hour - 4; // UAE is GST (UTC+4)
-
+  const utcHour = hour - 4;
   let daysAhead = (targetDay - currentDay + 7) % 7;
-  if (daysAhead === 0 && now.getUTCHours() >= utcHour) {
-    daysAhead = 7;
-  }
-
+  if (daysAhead === 0 && now.getUTCHours() >= utcHour) daysAhead = 7;
   const startDt = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + daysAhead, utcHour, 0, 0));
   const endDt = new Date(startDt.getTime() + 60 * 60 * 1000);
   return { startsAt: startDt.toISOString(), endsAt: endDt.toISOString() };
@@ -109,8 +130,11 @@ const server = http.createServer((req, res) => {
         if (!name) return sendJson(res, 400, { success: false, message: 'Full name is required.' });
         if (!email || !email.includes('@')) return sendJson(res, 400, { success: false, message: 'A valid email address is required.' });
         if (!sessionDay || !sessionTime) return sendJson(res, 400, { success: false, message: 'Please select a webinar session.' });
+        if (sessionDay.toLowerCase().includes('24 nov') || sessionDay.toLowerCase().includes('24 november')) {
+          return sendJson(res, 400, { success: false, message: 'The 24 November session is fully booked. Please choose an available slot.' });
+        }
 
-        const dates = calculateSessionDates(sessionDay, sessionTime);
+        const dates = calculateSessionDates(sessionDay, sessionTime, sessionInfo.startsAt, sessionInfo.endsAt);
         const timestamp = new Date().toISOString();
         const regId = 'sprng_' + Date.now() + '_' + crypto.randomBytes(3).toString('hex');
         const clientIp = req.socket.remoteAddress || 'unknown';

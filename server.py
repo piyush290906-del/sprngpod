@@ -62,9 +62,23 @@ def init_db():
 
 init_db()
 
-def calculate_session_dates(day_name, time_str):
-    target_day = 1 if "tue" in day_name.lower() else 3  # 0=Monday in Python: 1=Tuesday, 3=Thursday
-    hour = 16 if "4:00" in time_str else 14
+def calculate_session_dates(day_name, time_str, explicit_starts=None, explicit_ends=None):
+    if explicit_starts and explicit_ends:
+        return explicit_starts, explicit_ends
+
+    d = (day_name or "").lower()
+    is_4pm = "4:00" in (time_str or "")
+    if "24 nov" in d:
+        return ("2026-11-24T12:00:00Z", "2026-11-24T13:00:00Z") if is_4pm else ("2026-11-24T10:00:00Z", "2026-11-24T11:00:00Z")
+    if "26 nov" in d:
+        return ("2026-11-26T12:00:00Z", "2026-11-26T13:00:00Z") if is_4pm else ("2026-11-26T10:00:00Z", "2026-11-26T11:00:00Z")
+    if "1 dec" in d:
+        return ("2026-12-01T12:00:00Z", "2026-12-01T13:00:00Z") if is_4pm else ("2026-12-01T10:00:00Z", "2026-12-01T11:00:00Z")
+    if "3 dec" in d:
+        return ("2026-12-03T12:00:00Z", "2026-12-03T13:00:00Z") if is_4pm else ("2026-12-03T10:00:00Z", "2026-12-03T11:00:00Z")
+
+    target_day = 1 if "tue" in d else 3  # 0=Monday in Python: 1=Tuesday, 3=Thursday
+    hour = 16 if is_4pm else 14
     utc_hour = hour - 4  # UAE is GST (UTC+4)
 
     now = datetime.datetime.now(datetime.timezone.utc)
@@ -144,8 +158,11 @@ class WebinarRequestHandler(SimpleHTTPRequestHandler):
         if not session_day or not session_time:
             self.send_json(HTTPStatus.BAD_REQUEST, {"success": False, "message": "Please select a valid webinar session."})
             return
+        if "24 nov" in session_day.lower() or "24 november" in session_day.lower():
+            self.send_json(HTTPStatus.BAD_REQUEST, {"success": False, "message": "The 24 November session is fully booked. Please select an available slot."})
+            return
 
-        starts_at, ends_at = calculate_session_dates(session_day, session_time)
+        starts_at, ends_at = calculate_session_dates(session_day, session_time, session_info.get("startsAt"), session_info.get("endsAt"))
         timestamp = datetime.datetime.now(datetime.timezone.utc).isoformat().replace("+00:00", "Z")
         reg_id = f"sprng_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}_{os.urandom(3).hex()}"
         client_ip = self.client_address[0] if self.client_address else "unknown"
