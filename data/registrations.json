@@ -1,0 +1,55 @@
+[
+  {
+    "id": "sprng_20261122001056_f3abb7",
+    "registeredAt": "2026-11-21T18:40:56.732682Z",
+    "name": "Sarah Connor",
+    "email": "sarah@skynet-defense.com",
+    "phone": "",
+    "company": "Cyberdyne Resistance",
+    "designation": "Commander",
+    "session": {
+      "day": "Thursday",
+      "time": "4:00 PM",
+      "timezone": "Asia/Dubai",
+      "startsAt": "2026-11-26T12:00:00Z",
+      "endsAt": "2026-11-26T13:00:00Z"
+    },
+    "ipAddress": "127.0.0.1"
+  },
+  {
+    "id": "sprng_1795286535860_5cda1f",
+    "registeredAt": "2026-11-21T18:42:15.860Z",
+    "name": "Marcus Vance",
+    "email": "marcus.vance@example.com",
+    "phone": "",
+    "company": "Vance Real Estate",
+    "designation": "Property Manager",
+    "session": {
+      "day": "Tuesday",
+      "time": "4:00 PM",
+      "timezone": "Asia/Dubai",
+      "startsAt": "2026-11-24T12:00:00.000Z",
+      "endsAt": "2026-11-24T13:00:00.000Z"
+    },
+    "ipAddress": "::1"
+  },
+  {
+    "_id": "sprng_1795450994907_54128c",
+    "registrationId": "sprng_1795450994907_54128c",
+    "name": "Bruce Wayne",
+    "email": "bruce@wayneenterprises.com",
+    "phone": "+1 202 555 0199",
+    "company": "Wayne Enterprises",
+    "designation": "CEO",
+    "session": {
+      "day": "Tuesday",
+      "time": "2:00 PM",
+      "timezone": "Asia/Dubai",
+      "startsAt": "2026-11-24T10:00:00.000Z",
+      "endsAt": "2026-11-24T11:00:00.000Z"
+    },
+    "registeredAt": "2026-11-23T16:23:14.933Z",
+    "registeredAtIso": "2026-11-23T16:23:14.907Z",
+    "ipAddress": "::1"
+  }
+]

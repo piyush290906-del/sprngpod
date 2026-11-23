@@ -1,0 +1,22 @@
+{
+  "name": "sprngpod-webinar-landing",
+  "version": "1.0.0",
+  "description": "SPRNGPOD Webinar Landing Page with Registration Backend",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "start:py": "python server.py"
+  },
+  "keywords": [
+    "sprngpod",
+    "webinar",
+    "landing-page",
+    "registration"
+  ],
+  "author": "SPRNGPOD",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^18.0.10",
+    "mongodb": "^7.9.1"
+  }
+}

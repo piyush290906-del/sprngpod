@@ -1,0 +1,4 @@
+id,registeredAt,name,email,phone,company,designation,sessionDay,sessionTime,timezone,startsAt,endsAt
+sprng_20261122001056_f3abb7,2026-11-21T18:40:56.732682Z,Sarah Connor,sarah@skynet-defense.com,,Cyberdyne Resistance,Commander,Thursday,4:00 PM,Asia/Dubai,2026-11-26T12:00:00Z,2026-11-26T13:00:00Z
+"sprng_1795286535860_5cda1f","2026-11-21T18:42:15.860Z","Marcus Vance","marcus.vance@example.com","","Vance Real Estate","Property Manager","Tuesday","4:00 PM","Asia/Dubai","2026-11-24T12:00:00.000Z","2026-11-24T13:00:00.000Z"
+"sprng_1795450994907_54128c","2026-11-23T16:23:14.907Z","Bruce Wayne","bruce@wayneenterprises.com","+1 202 555 0199","Wayne Enterprises","CEO","Tuesday","2:00 PM","Asia/Dubai","2026-11-24T10:00:00.000Z","2026-11-24T11:00:00.000Z"
