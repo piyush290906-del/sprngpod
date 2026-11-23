@@ -247,6 +247,8 @@ class WebinarRequestHandler(SimpleHTTPRequestHandler):
             self.path = "/webinar/register/index.html"
         elif path == "/webinar/success":
             self.path = "/webinar/success/index.html"
+        elif path == "/admin":
+            self.path = "/admin.html"
 
         super().do_GET()
 

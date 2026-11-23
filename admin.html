@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SPRNGPOD Webinar Registrations - Admin</title>
+<link rel="icon" type="image/svg+xml" href="/assets/sprngpod-logo.svg">
+<link rel="stylesheet" href="/assets/webinar.css">
+<style>
+  body { background: #f6f8f3; font-family: Inter, system-ui, sans-serif; color: #102d32; padding: 40px 20px; }
+  .admin-container { max-width: 1100px; margin: 0 auto; }
+  .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px; }
+  .admin-header h1 { margin: 0; font-size: 28px; letter-spacing: -0.04em; }
+  .stats-card { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 20px 24px; display: inline-flex; align-items: baseline; gap: 12px; margin-bottom: 24px; box-shadow: 0 4px 20px #102d320a; }
+  .stats-number { font-size: 36px; font-weight: 800; color: #168a78; line-height: 1; }
+  .stats-label { color: #607579; font-size: 14px; font-weight: 600; }
+  .actions-bar { display: flex; gap: 12px; }
+  .table-card { background: #fff; border: 1px solid var(--line); border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px #102d320f; }
+  .table-responsive { width: 100%; overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
+  thead { background: #eaf2e9; }
+  th { padding: 14px 16px; font-weight: 700; color: #355358; font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--line); }
+  td { padding: 16px; border-bottom: 1px solid #edf2ee; vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #fbfdfa; }
+  .badge { display: inline-block; padding: 4px 10px; border-radius: 99px; font-size: 12px; font-weight: 700; background: #e7f5ed; color: #168a78; }
+  .empty-state { padding: 48px 20px; text-align: center; color: #607579; }
+</style>
+</head>
+<body>
+<div class="admin-container">
+  <div class="admin-header">
+    <div>
+      <a class="brand" href="/" style="margin-bottom: 8px; display: inline-flex;">
+        <span class="brand-mark" aria-hidden="true">
+          <svg class="brand-logo-svg" viewBox="0 0 496 411" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect x="1" y="160" width="52" height="170" rx="26" fill="#A7DEFE"/><rect x="89" y="82" width="52" height="280" rx="26" fill="#3DB8FF"/><rect x="180" y="180" width="52" height="133" rx="26" fill="#A7DEFE"/><rect x="266" y="1" width="52" height="329" rx="26" fill="#C1F803"/><rect x="357" y="160" width="52" height="249" rx="26" fill="#3DB8FF"/><rect x="443" y="131" width="52" height="201" rx="26" fill="#C1F803"/></svg>
+        </span>
+        <span class="brand-word">SPRNGPOD</span>
+      </a>
+      <h1>Webinar Registrations</h1>
+    </div>
+    <div class="actions-bar">
+      <a class="btn" href="/api/registrations/export" download>
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+        Download CSV (Excel)
+      </a>
+      <a class="btn secondary" href="/" target="_blank">View Site ↗</a>
+    </div>
+  </div>
+
+  <div class="stats-card">
+    <span class="stats-number" id="count-display">0</span>
+    <span class="stats-label">Total Registered Attendees</span>
+  </div>
+
+  <div class="table-card">
+    <div class="table-responsive">
+      <table>
+        <thead>
+          <tr>
+            <th>Date Registered</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th>Company / Role</th>
+            <th>Selected Session</th>
+          </tr>
+        </thead>
+        <tbody id="registrations-body">
+          <tr><td colspan="6" class="empty-state">Loading registrations…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+async function loadRegistrations() {
+  const tbody = document.getElementById('registrations-body');
+  const countDisplay = document.getElementById('count-display');
+  try {
+    const res = await fetch('/api/registrations');
+    const data = await res.json();
+    const list = data.registrations || [];
+    countDisplay.textContent = list.length;
+
+    if (list.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No registrations received yet.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = list.map(r => {
+      const dateStr = r.registeredAt || r.registered_at ? new Date(r.registeredAt || r.registered_at).toLocaleString() : '—';
+      const session = r.session ? (r.session.day + ' — ' + r.session.time) : (r.session_day ? (r.session_day + ' — ' + r.session_time) : '—');
+      const companyRole = [r.company, r.designation].filter(Boolean).join(' · ') || '—';
+      return `
+        <tr>
+          <td><small style="color:#607579">${dateStr}</small></td>
+          <td><strong>${escapeHtml(r.name || '—')}</strong></td>
+          <td><a href="mailto:${escapeHtml(r.email)}" style="color:#168a78; font-weight:600;">${escapeHtml(r.email || '—')}</a></td>
+          <td>${escapeHtml(r.phone || '—')}</td>
+          <td>${escapeHtml(companyRole)}</td>
+          <td><span class="badge">${escapeHtml(session)}</span></td>
+        </tr>
+      `;
+    }).join('');
+  } catch (err) {
+    tbody.innerHTML = '<tr><td colspan="6" class="empty-state" style="color:#c34b4b;">Failed to load data: ' + escapeHtml(err.message) + '</td></tr>';
+  }
+}
+
+function escapeHtml(s) {
+  return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+loadRegistrations();
+</script>
+</body>
+</html>

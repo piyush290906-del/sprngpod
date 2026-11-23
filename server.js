@@ -209,6 +209,8 @@ const server = http.createServer((req, res) => {
     filePath = path.join(ROOT_DIR, 'webinar', 'register', 'index.html');
   } else if (pathname === '/webinar/success') {
     filePath = path.join(ROOT_DIR, 'webinar', 'success', 'index.html');
+  } else if (pathname === '/admin') {
+    filePath = path.join(ROOT_DIR, 'admin.html');
   }
 
   fs.stat(filePath, (err, stats) => {
